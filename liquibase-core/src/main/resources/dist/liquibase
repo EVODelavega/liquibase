@@ -1,25 +1,36 @@
 #! /bin/sh
 
+pattern_match() {
+    case "$1" in
+        $2)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac;
+}
+
 if [ ! -n "${LIQUIBASE_HOME+x}" ]; then
   # echo "LIQUIBASE_HOME is not set."
 
   ## resolve links - $0 may be a symlink
   PRG="$0"
   while [ -h "$PRG" ] ; do
-    ls=`ls -ld "$PRG"`
-    link=`expr "$ls" : '.*-> \(.*\)$'`
+    ls=$(ls -ld "$PRG")
+    link=$(expr "$ls" : '.*-> \(.*\)$')
     if expr "$link" : '/.*' > /dev/null; then
     PRG="$link"
     else
-    PRG=`dirname "$PRG"`"/$link"
+    PRG=$(dirname "$PRG")"/$link"
     fi
   done
 
 
-  LIQUIBASE_HOME=`dirname "$PRG"`
+  LIQUIBASE_HOME=$(dirname "$PRG")
 
   # make it fully qualified
-  LIQUIBASE_HOME=`cd "$LIQUIBASE_HOME" && pwd`
+  LIQUIBASE_HOME=$(cd "$LIQUIBASE_HOME" && pwd)
   # echo "Liquibase Home: $LIQUIBASE_HOME"
 fi
 
@@ -28,15 +39,15 @@ fi
 if [ -f /usr/bin/cygpath ]; then
   CP=.
   for i in "$LIQUIBASE_HOME"/liquibase*.jar; do
-    i=`cygpath --windows "$i"`
+    i=$(cygpath --windows "$i")
     CP="$CP;$i"
   done
   for i in "$LIQUIBASE_HOME"/lib/*.jar; do
-    i=`cygpath --windows "$i"`
+    i=$(cygpath --windows "$i")
     CP="$CP;$i"
   done
 else
-  if [[ $(uname) = MINGW* ]]; then
+  if pattern_match $(uname) 'MINGW*'; then
     CP_SEPARATOR=";"
   else
     CP_SEPARATOR=":"
